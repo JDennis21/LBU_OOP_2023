@@ -1,3 +1,4 @@
+import java.util.Scanner;
 
 public class FirstClass
 {
@@ -10,8 +11,21 @@ public class FirstClass
 	
 	public void go()
 	{
-		int age = 19;
-		System.out.println("your age is " + age);
+		Scanner scan = new Scanner(System.in);
+		
+		System.out.print("Enter your age ");
+		int age = scan.nextInt();
+		
+		if (age > 20)
+		{
+			System.out.println("Your are " + age + " years old");
+
+		}
+		else 
+		{
+			System.out.println("Your are " + age + " years young");
+
+		}
 	}
 }
 
