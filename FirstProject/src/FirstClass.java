@@ -4,8 +4,15 @@ public class FirstClass
 
 	public static void main(String[] args)
 	{
-		System.out.println("Hello World.");
-		System.out.println("It's my first day!");
+		FirstClass Obj = new FirstClass();
+		Obj.go();
 	}
-
+	
+	public void go()
+	{
+		int age = 19;
+		System.out.println("your age is " + age);
+	}
 }
+
+
