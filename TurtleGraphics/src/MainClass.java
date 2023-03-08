@@ -4,9 +4,9 @@ import javax.swing.JFrame;
 
 import uk.ac.leedsbeckett.oop.LBUGraphics;
 
-public class Main extends LBUGraphics
+public class MainClass extends LBUGraphics
 {
-        /**
+    /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
@@ -14,10 +14,10 @@ public class Main extends LBUGraphics
 
 		public static void main(String[] args)
         {
-                new Main(); //create instance of class that extends LBUGraphics (could be separate class without main), gets out of static context
+                new MainClass(); //create instance of class that extends LBUGraphics (could be separate class without main), gets out of static context
         }
 
-        public Main()
+        public MainClass()
         {
                 JFrame MainFrame = new JFrame();                //create a frame to display the turtle panel on
                 MainFrame.setLayout(new FlowLayout());  //not strictly necessary
