@@ -24,7 +24,7 @@ public class MainClass extends LBUGraphics
                 MainFrame.add(this);                                    //"this" is this object that extends turtle graphics so we are adding a turtle graphics panel to the frame
                 MainFrame.pack();                                               //set the frame to a size we can see
                 MainFrame.setVisible(true);                             //now display it
-                //about();                                                                //call the LBUGraphics about method to display version information.
+                about();                                                                //call the LBUGraphics about method to display version information.
                 penDown();
                 forward(100);
                 turnRight();
