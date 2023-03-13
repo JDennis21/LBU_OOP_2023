@@ -90,8 +90,9 @@ public class GraphicsSystem extends LBUGraphics
 					setPenColour(red);
 				else if(cmd.equals("white"))
 					setPenColour(white);
-				else if(cmd.equals("reset"))
+				else if(cmd.equals("reset")) {
 					reset();
+					penDown();}
 				else if(cmd.equals("clear"))
 					clear();
 				else 
