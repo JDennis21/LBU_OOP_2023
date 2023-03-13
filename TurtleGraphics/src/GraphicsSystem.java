@@ -29,19 +29,23 @@ public class GraphicsSystem extends LBUGraphics
 	{
 		String[] cmd_list = command.toLowerCase().split(" ");
 		String cmd = cmd_list[0];
-		
-		System.out.println("command typed " + command);
 				
 		if(cmdCheck(cmd))
 		{
-			paramCheck(cmd, cmd_list, cmd_list.length);
+			if(cmd_list.length > 1) 
+			{
+				cmdParam(cmd, cmd_list);
+			}
+			else if(cmd_list.length == 1) 
+			{
+				cmdNoParam(cmd);
+			}
 		}
 		else 
 		{
-			System.out.println("Command is not recongnised.");
+			displayMessage("Command is not recongnised.");
 		}
-	}
-		
+	}	
 	public Boolean cmdCheck(String cmd) 
 	{
 		String[] commands = new String[]{"forward", "backward", "turnleft", "turnright", "abou"
@@ -50,58 +54,56 @@ public class GraphicsSystem extends LBUGraphics
 		
 		return cmdList.contains(cmd);
 	}
-	
-	public void paramCheck(String cmd, String[] cmd_list, int ListLength) 
+	public void cmdParam(String cmd, String[] cmd_list) 
 	{
 		try 
 		{
-			Color black = new Color(0, 0, 0);
-			Color green = new Color(0, 255, 0);
-			Color red = new Color(255, 0, 0);
-			Color white = new Color(255, 255, 255);
-			
-			if(ListLength > 1) 
-			{
-				int num_amount = Integer.parseInt(cmd_list[1]);
-				if(num_amount < 0 || 360 < num_amount)
-					System.out.println("Integer must be greater than zero.");
-				else if(cmd.equals("forward") && 0 < num_amount && num_amount <= 100)
-					forward(num_amount);
-				else if(cmd.equals("backward") && 0 < num_amount && num_amount <= 100)
-					forward(-num_amount);
-				else if(cmd.equals("turnleft") && 0 < num_amount && num_amount <= 360)
-					turnLeft(num_amount);
-				else if(cmd.equals("turnright") && 0 < num_amount && num_amount <= 360)
-					turnRight(num_amount);
-			}
-			else if(ListLength == 1) 
-			{
-				if(cmd.equals("about"))
-					about();
-				else if(cmd.equals("penup"))
-					penUp();
-				else if(cmd.equals("pendown"))
-					penDown();
-				else if(cmd.equals("black"))
-					setPenColour(black);
-				else if(cmd.equals("green")) 
-					setPenColour(green);
-				else if(cmd.equals("red"))
-					setPenColour(red);
-				else if(cmd.equals("white"))
-					setPenColour(white);
-				else if(cmd.equals("reset")) {
-					reset();
-					penDown();}
-				else if(cmd.equals("clear"))
-					clear();
-				else 
-					System.out.println("Parameter is missing.");	
-			}
+			int num_amount = Integer.parseInt(cmd_list[1]);
+			if((cmd.equals("forward") || cmd.equals("backward")) && (0 >= num_amount || num_amount > 100))
+				displayMessage("Paramater must be an Integer between 1 and 100");
+			else if((cmd.equals("turnright") || cmd.equals("turnleft")) && (0 >= num_amount || num_amount > 360))
+				displayMessage("Paramater must be an Integer between 1 and 360");
+			else if(cmd.equals("forward") && 0 < num_amount && num_amount <= 100)
+				forward(num_amount);
+			else if(cmd.equals("backward") && 0 < num_amount && num_amount <= 100)
+				forward(-num_amount);
+			else if(cmd.equals("turnleft") && 0 < num_amount && num_amount < 360)
+				turnLeft(num_amount);
+			else if(cmd.equals("turnright") && 0 < num_amount && num_amount < 360)
+				turnRight(num_amount);	
 		}
 		catch(Exception e) 
 		{
-			System.out.println("Parameter requires Integer.");
+			displayMessage("Parameter requires Integer.");
 		}
+	}
+	public void cmdNoParam(String cmd)
+	{
+		Color black = new Color(0, 0, 0);
+		Color green = new Color(0, 255, 0);
+		Color red = new Color(255, 0, 0);
+		Color white = new Color(255, 255, 255);
+		
+		if(cmd.equals("about"))
+			about();
+		else if(cmd.equals("penup"))
+			penUp();
+		else if(cmd.equals("pendown"))
+			penDown();
+		else if(cmd.equals("black"))
+			setPenColour(black);
+		else if(cmd.equals("green")) 
+			setPenColour(green);
+		else if(cmd.equals("red"))
+			setPenColour(red);
+		else if(cmd.equals("white"))
+			setPenColour(white);
+		else if(cmd.equals("reset")) {
+			reset();
+			penDown();}
+		else if(cmd.equals("clear"))
+			clear();
+		else 
+			displayMessage("Parameter is missing.");	
 	}
 }
