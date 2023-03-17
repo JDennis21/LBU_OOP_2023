@@ -27,83 +27,97 @@ public class GraphicsSystem extends LBUGraphics
 	
 	public void processCommand(String command)       
 	{
-		String[] cmd_list = command.toLowerCase().split(" ");
-		String cmd = cmd_list[0];
+		String[] userInput = command.toLowerCase().split(" ");
+		String cmd = userInput[0];
 				
-		if(cmdCheck(cmd))
+		String[] paramCommands = new String[]{"forward", "backward", "turnleft", "turnright"};
+		String[] noParamCommands = new String[] {"about", "penup", "pendown", "black","green", "red", "white", "reset", "clear"};
+		
+		List<String> paramArray = new ArrayList<>(Arrays.asList(paramCommands));
+		List<String> noParamArray = new ArrayList<>(Arrays.asList(noParamCommands));
+		
+		if(paramArray.contains(cmd) && userInput.length > 1 || noParamArray.contains(cmd))
 		{
-			if(cmd_list.length > 1) 
+			if(userInput.length > 1) 
 			{
-				cmdParam(cmd, cmd_list);
+				cmdParam(cmd, paramCommands, userInput);
 			}
-			else if(cmd_list.length == 1) 
+			else if(userInput.length == 1) 
 			{
-				cmdNoParam(cmd);
+				cmdNoParam(cmd, noParamCommands);
 			}
+		}
+		else if(paramArray.contains(cmd)) 
+		{
+			displayMessage("Command requires a parameter.");
 		}
 		else 
 		{
 			displayMessage("Command is not recongnised.");
 		}
 	}	
-	public Boolean cmdCheck(String cmd) 
-	{
-		String[] commands = new String[]{"forward", "backward", "turnleft", "turnright", "abou"
-				+ "t", "penup", "pendown", "black", "green", "red", "white", "reset", "clear"};
-		List<String> cmdList = new ArrayList<>(Arrays.asList(commands));
-		
-		return cmdList.contains(cmd);
-	}
-	public void cmdParam(String cmd, String[] cmd_list) 
+	
+	public void cmdParam(String cmd, String[] ParamCommands, String[] userInput) 
 	{
 		try 
 		{
-			int num_amount = Integer.parseInt(cmd_list[1]);
+			int num_amount = Integer.parseInt(userInput[1]);
+			
+			Runnable[] paramArray = new Runnable[4];
+			paramArray[0] = () -> forward(num_amount);
+			paramArray[1] = () -> forward(-num_amount);
+			paramArray[2] = () -> turnLeft(num_amount);
+			paramArray[3] = () -> turnRight(num_amount);
+			
 			if((cmd.equals("forward") || cmd.equals("backward")) && (0 >= num_amount || num_amount > 100))
 				displayMessage("Paramater must be an Integer between 1 and 100");
 			else if((cmd.equals("turnright") || cmd.equals("turnleft")) && (0 >= num_amount || num_amount > 360))
 				displayMessage("Paramater must be an Integer between 1 and 360");
-			else if(cmd.equals("forward") && 0 < num_amount && num_amount <= 100)
-				forward(num_amount);
-			else if(cmd.equals("backward") && 0 < num_amount && num_amount <= 100)
-				forward(-num_amount);
-			else if(cmd.equals("turnleft") && 0 < num_amount && num_amount < 360)
-				turnLeft(num_amount);
-			else if(cmd.equals("turnright") && 0 < num_amount && num_amount < 360)
-				turnRight(num_amount);	
+			else for(int i = 0; i < ParamCommands.length; i++) 
+			{
+				if(cmd.equals(ParamCommands[i])) 
+				{
+					paramArray[i].run();
+					break;
+				}
+				else continue;
+			}
 		}
 		catch(Exception e) 
 		{
 			displayMessage("Parameter requires Integer.");
 		}
 	}
-	public void cmdNoParam(String cmd)
+	public void cmdNoParam(String cmd, String[] noParamCommands)
 	{
 		Color black = new Color(0, 0, 0);
 		Color green = new Color(0, 255, 0);
 		Color red = new Color(255, 0, 0);
 		Color white = new Color(255, 255, 255);
 		
-		if(cmd.equals("about"))
-			about();
-		else if(cmd.equals("penup"))
-			penUp();
-		else if(cmd.equals("pendown"))
-			penDown();
-		else if(cmd.equals("black"))
-			setPenColour(black);
-		else if(cmd.equals("green")) 
-			setPenColour(green);
-		else if(cmd.equals("red"))
-			setPenColour(red);
-		else if(cmd.equals("white"))
-			setPenColour(white);
-		else if(cmd.equals("reset")) {
-			reset();
-			penDown();}
-		else if(cmd.equals("clear"))
-			clear();
-		else 
-			displayMessage("Parameter is missing.");	
+		Runnable[] noParamArray = new Runnable[9];
+		noParamArray[0] = () -> about();
+		noParamArray[1] = () -> penUp();
+		noParamArray[2] = () -> penDown();
+		noParamArray[3] = () -> setPenColour(black);
+		noParamArray[4] = () -> setPenColour(green);
+		noParamArray[5] = () -> setPenColour(red);
+		noParamArray[6] = () -> setPenColour(white);
+		noParamArray[7] = () -> reset();
+		noParamArray[8] = () -> clear();
+		
+		for(int i = 0; i < noParamCommands.length; i++) 
+		{
+			if(cmd.equals("reset")) {
+				reset();
+				penDown();
+			}
+			else if(cmd.equals(noParamCommands[i])) 
+			{
+				noParamArray[i].run();
+				break;
+			}
+			else continue;
+		}	
 	}
 }
