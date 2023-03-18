@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import uk.ac.leedsbeckett.oop.LBUGraphics;
@@ -131,24 +130,26 @@ public class GraphicsSystem extends LBUGraphics
 	}
 	public void saveImg()
 	{
-		try {
+		try 
+		{
 		    BufferedImage bufImg = getBufferedImage();  
 		    File outputFile = new File("saved.png");
 		    ImageIO.write(bufImg, "png", outputFile);
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 		    displayMessage("error occured");
 		}
 	}
+	
 	public void loadImg() 
 	{
 		File inputFile = new File("saved.png");
-		
 		try
 		{
 			BufferedImage bufImg = ImageIO.read(inputFile);
 			setBufferedImage(bufImg);
 		} 
-		
 		catch (IOException e)
 		{
 			displayMessage("error occured");
