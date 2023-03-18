@@ -1,0 +1,38 @@
+penup
+forward 100
+pendown
+turnright 90
+green
+forward 100
+turnright 90
+red
+forward 100
+green
+forward 100
+turnright 90
+red
+forward 100
+green
+forward 100
+turnright 90
+red
+forward 100
+green
+forward 100
+turnright 90
+red
+forward 100
+turnright 90
+forward 100
+green
+forward 100
+turnright 180
+forward 100
+turnright 90
+red
+forward 100
+turnright 180
+forward 100
+green
+forward 100
+reset
