@@ -1,8 +1,13 @@
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import uk.ac.leedsbeckett.oop.LBUGraphics;
 
@@ -31,7 +36,7 @@ public class GraphicsSystem extends LBUGraphics
 		String cmd = userInput[0];
 				
 		String[] paramCommands = new String[]{"forward", "backward", "turnleft", "turnright"};
-		String[] noParamCommands = new String[] {"about", "penup", "pendown", "black","green", "red", "white", "reset", "clear"};
+		String[] noParamCommands = new String[] {"about", "penup", "pendown", "black", "green", "red", "white", "reset", "clear", "saveimage", "loadimage"};
 		
 		List<String> paramArray = new ArrayList<>(Arrays.asList(paramCommands));
 		List<String> noParamArray = new ArrayList<>(Arrays.asList(noParamCommands));
@@ -88,6 +93,7 @@ public class GraphicsSystem extends LBUGraphics
 			displayMessage("Parameter requires Integer.");
 		}
 	}
+	
 	public void cmdNoParam(String cmd, String[] noParamCommands)
 	{
 		Color black = new Color(0, 0, 0);
@@ -95,7 +101,7 @@ public class GraphicsSystem extends LBUGraphics
 		Color red = new Color(255, 0, 0);
 		Color white = new Color(255, 255, 255);
 		
-		Runnable[] noParamArray = new Runnable[9];
+		Runnable[] noParamArray = new Runnable[11];
 		noParamArray[0] = () -> about();
 		noParamArray[1] = () -> penUp();
 		noParamArray[2] = () -> penDown();
@@ -105,6 +111,9 @@ public class GraphicsSystem extends LBUGraphics
 		noParamArray[6] = () -> setPenColour(white);
 		noParamArray[7] = () -> reset();
 		noParamArray[8] = () -> clear();
+		noParamArray[9] = () -> saveImg();
+		noParamArray[10] = () -> loadImg();
+		
 		
 		for(int i = 0; i < noParamCommands.length; i++) 
 		{
@@ -119,5 +128,31 @@ public class GraphicsSystem extends LBUGraphics
 			}
 			else continue;
 		}	
+	}
+	public void saveImg()
+	{
+		try {
+		    BufferedImage bufImg = getBufferedImage();  
+		    File outputFile = new File("saved.png");
+		    ImageIO.write(bufImg, "png", outputFile);
+		} catch (IOException e) {
+		    displayMessage("error occured");
+		}
+	}
+	public void loadImg() 
+	{
+		File inputFile = new File("saved.png");
+		
+		try
+		{
+			BufferedImage bufImg = ImageIO.read(inputFile);
+			setBufferedImage(bufImg);
+		} 
+		
+		catch (IOException e)
+		{
+			displayMessage("error occured");
+		}
+		
 	}
 }
