@@ -36,8 +36,8 @@ public class GraphicsSystem extends LBUGraphics
 	ArrayList<String> allUserInput = new ArrayList<String>();
 	
 	String[] paramCommands = new String[]{"forward", "backward", "turnleft", "turnright"};
-	String[] noParamCommands = new String[] {"about", "penup", "pendown", "blue", "green", "red", "white", "reset", "clear", "saveimage", "loadimage",
-			"savecommands", "loadcommands"};
+	String[] noParamCommands = new String[] {"about", "penup", "pendown", "blue", "green", "red", "white",
+			"reset", "clear", "saveimage", "loadimage", "savecommands", "loadcommands"};
 	
 	public void processCommand(String command)       
 	{
