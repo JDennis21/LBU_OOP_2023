@@ -17,6 +17,8 @@ import uk.ac.leedsbeckett.oop.LBUGraphics;
 public class GraphicsSystem extends LBUGraphics
 {
 	private static final long serialVersionUID = 1L;
+	
+	boolean warnedUser = false;
 
 	public static void main(String[] args)
 	{
@@ -36,6 +38,7 @@ public class GraphicsSystem extends LBUGraphics
 	ArrayList<String> allUserInput = new ArrayList<String>();
 	
 	String[] paramCommands = new String[]{"forward", "backward", "turnleft", "turnright"};
+	
 	String[] noParamCommands = new String[] {"about", "penup", "pendown", "blue", "green", "red", "white",
 			"reset", "clear", "saveimage", "loadimage", "savecommands", "loadcommands"};
 	
@@ -125,7 +128,7 @@ public class GraphicsSystem extends LBUGraphics
 		noParamArray[9] = () -> saveImg(savedImg);
 		noParamArray[10] = () -> loadImg(savedImg);
 		noParamArray[11] = () -> saveCmd(allUserInput, savedCmd, cmd);
-		noParamArray[12] = () -> loadCmd(savedCmd);
+		noParamArray[12] = () -> loadCmd(savedCmd, warnedUser);
 		
 		for(int i = 0; i < noParamCommands.length; i++) 
 		{
@@ -173,6 +176,7 @@ public class GraphicsSystem extends LBUGraphics
 		try
 		{
 			BufferedWriter bw = new BufferedWriter(new FileWriter("savedCmd.txt"));
+			
 			 for(int i = 0; i < allUserInput.size(); i++)
 				 if(!allUserInput.get(i).equals("savecommands") && !allUserInput.get(i).equals("loadcommands"))
 					{
@@ -186,18 +190,28 @@ public class GraphicsSystem extends LBUGraphics
 		}
 	}
 	
-	public void loadCmd(boolean savedCmd)
+	public void loadCmd(boolean savedCmd, boolean warnedUser)
 	{
 		try 
 		{
-			BufferedReader br = new BufferedReader(new FileReader("savedCmd.txt"));
-			String line = br.readLine();
-			while (line != null) 
+			if(warnedUser) 
 			{
-				processCommand(line);
-				line = br.readLine();
+				BufferedReader br = new BufferedReader(new FileReader("savedCmd.txt"));
+				String line = br.readLine();
+				while (line != null) 
+				{
+					processCommand(line);
+					line = br.readLine();
+				}
+				br.close();
+				savedCmd = true;
+				warnedUser = false;
 			}
-			br.close();
+			else
+			{
+				displayMessage("Current instance is not saved. Repeat to confirm override.");
+				warnedUser = true;
+			}
 		} 
 		catch (IOException e) 
 		{
