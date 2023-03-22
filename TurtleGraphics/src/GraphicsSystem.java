@@ -1,24 +1,21 @@
+
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.imageio.ImageIO;
+
 import javax.swing.JFrame;
+
+import c3641149.Store;
 import uk.ac.leedsbeckett.oop.LBUGraphics;
 
 public class GraphicsSystem extends LBUGraphics
 {
 	private static final long serialVersionUID = 1L;
 	
-	boolean warnedUser = false;
+	Store store = new Store();
 
 	public static void main(String[] args)
 	{
@@ -37,15 +34,15 @@ public class GraphicsSystem extends LBUGraphics
 	
 	ArrayList<String> allUserInput = new ArrayList<String>();
 	
-	String[] paramCommands = new String[]{"forward", "backward", "turnleft", "turnright"};
+	String[] paramCommands = new String[]{"forward", "backward", "turnleft", "turnright", "saveimage", "loadimage", "savecommands", "loadcommands"};
 	
 	String[] noParamCommands = new String[] {"about", "penup", "pendown", "blue", "green", "red", "white",
-			"reset", "clear", "saveimage", "loadimage", "savecommands", "loadcommands"};
+			"reset", "clear"};
 	
+	boolean savedCmd = true, savedImg = true
+			;
 	public void processCommand(String command)       
 	{
-		boolean savedCmd = false, savedImg = false;
-		
 		allUserInput.add(command.toLowerCase());
 		
 		String[] userInput = command.toLowerCase().split(" ");
@@ -58,11 +55,11 @@ public class GraphicsSystem extends LBUGraphics
 		{
 			if(userInput.length > 1) 
 			{
-				cmdParam(cmd, paramCommands, userInput);
+				cmdParam(paramCommands, allUserInput);
 			}
 			else if(userInput.length == 1) 
 			{
-				cmdNoParam(cmd, noParamCommands, allUserInput, savedImg, savedCmd);
+				cmdNoParam(cmd, noParamCommands, allUserInput);
 			}
 		}
 		else if(paramArray.contains(cmd)) 
@@ -75,13 +72,26 @@ public class GraphicsSystem extends LBUGraphics
 		}
 	}	
 	
-	public void cmdParam(String cmd, String[] ParamCommands, String[] userInput) 
+	public void cmdParam(String[] ParamCommands, ArrayList<String> allUserInput) 
 	{
+		String lastUserInput = allUserInput.get(allUserInput.size() - 1);
+		String[] userInput = lastUserInput.toLowerCase().split(" ");
+		String cmd = userInput[0];
+		
+		Runnable[] paramArray = new Runnable[paramCommands.length];
+		paramArray[0] = () -> forward(0);
+		paramArray[1] = () -> forward(0);
+		paramArray[2] = () -> turnLeft(0);
+		paramArray[3] = () -> turnRight(0);
+		paramArray[4] = () -> handleImg(1, getBufferedImage(), userInput[1]);
+		paramArray[5] = () -> handleImg(2, getBufferedImage(), userInput[1]);
+		paramArray[6] = () -> handleCmd(1, allUserInput, userInput[1]);
+		paramArray[7] = () -> handleCmd(2, allUserInput, userInput[1]);
+		
 		try 
 		{
 			int num_amount = Integer.parseInt(userInput[1]);
 			
-			Runnable[] paramArray = new Runnable[paramCommands.length];
 			paramArray[0] = () -> forward(num_amount);
 			paramArray[1] = () -> forward(-num_amount);
 			paramArray[2] = () -> turnLeft(num_amount);
@@ -96,126 +106,119 @@ public class GraphicsSystem extends LBUGraphics
 				if(cmd.equals(ParamCommands[i])) 
 				{
 					paramArray[i].run();
+					savedCmd = false;
+					savedImg = false;
 					break;
-				}
-				else continue;
+				}else continue;
 			}
 		}
 		catch(Exception e) 
 		{
-			displayMessage("Parameter requires Integer.");
+			if(cmd.substring(0, 4).equals("save") || cmd.substring(0, 4).equals("load"))
+			{
+				for(int i = 4; i < ParamCommands.length; i++) 
+				{
+					if(cmd.equals(ParamCommands[i])) 
+					{
+						paramArray[i].run();
+						break;
+					}else continue;
+				}
+			}else displayMessage("Parameter requires Integer.");
 		}
 	}
 	
-	public void cmdNoParam(String cmd, String[] noParamCommands, ArrayList<String> allUserInput, boolean savedImg, boolean savedCmd)
+	public void cmdNoParam(String cmd, String[] noParamCommands, ArrayList<String> allUserInput)
 	{
-		Color red = new Color(255, 0, 0), blue  = new Color(0, 0, 255), green = new Color(0, 255, 0), white = new Color(255, 255, 255);;
-		
 		Runnable[] noParamArray = new Runnable[noParamCommands.length];
 		noParamArray[0] = () -> about();
 		noParamArray[1] = () -> penUp();
 		noParamArray[2] = () -> penDown();
-		noParamArray[3] = () -> setPenColour(blue);
-		noParamArray[4] = () -> setPenColour(green);
-		noParamArray[5] = () -> setPenColour(red);
-		noParamArray[6] = () -> setPenColour(white);
+		noParamArray[3] = () -> setPenColour(Color.blue);
+		noParamArray[4] = () -> setPenColour(Color.green);
+		noParamArray[5] = () -> setPenColour(Color.red);
+		noParamArray[6] = () -> setPenColour(Color.white);
 		noParamArray[7] = () -> {
 			reset();
 			penDown();
-			setPenColour(red);
+			setPenColour(Color.red);
 		};
 		noParamArray[8] = () -> clear();
-		noParamArray[9] = () -> saveImg(savedImg);
-		noParamArray[10] = () -> loadImg(savedImg);
-		noParamArray[11] = () -> saveCmd(allUserInput, savedCmd, cmd);
-		noParamArray[12] = () -> loadCmd(savedCmd, warnedUser);
 		
 		for(int i = 0; i < noParamCommands.length; i++) 
 		{
 			if(cmd.equals(noParamCommands[i])) 
 			{
 				noParamArray[i].run();
-				break;
-			}
-			else continue;
-		}	
-	}
-	
-	public void saveImg(boolean savedImg)
-	{
-		try 
-		{
-		    BufferedImage bufImg = getBufferedImage();  
-		    File outputFile = new File("savedImg.png");
-		    ImageIO.write(bufImg, "png", outputFile);
-		    savedImg = true;
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	public void loadImg(boolean savedImg)
-	{
-		try 
-		{
-			File inputFile = new File("savedImg.png");
-			
-			BufferedImage bufImg = ImageIO.read(inputFile);
-			setBufferedImage(bufImg);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	public void saveCmd(ArrayList<String> allUserInput, boolean savedCmd, String cmd)  
-	{
-		try
-		{
-			BufferedWriter bw = new BufferedWriter(new FileWriter("savedCmd.txt"));
-			
-			 for(int i = 0; i < allUserInput.size(); i++)
-				 if(!allUserInput.get(i).equals("savecommands") && !allUserInput.get(i).equals("loadcommands"))
-					{
-				    	bw.write(allUserInput.get(i) + "\n");
-					}else continue;
-			bw.close();
-		} 
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	public void loadCmd(boolean savedCmd, boolean warnedUser)
-	{
-		try 
-		{
-			if(warnedUser) 
-			{
-				BufferedReader br = new BufferedReader(new FileReader("savedCmd.txt"));
-				String line = br.readLine();
-				while (line != null) 
+				if(!cmd.equals("clear")) 
 				{
-					processCommand(line);
-					line = br.readLine();
-				}
-				br.close();
-				savedCmd = true;
-				warnedUser = false;
-			}
-			else
-			{
-				displayMessage("Current instance is not saved. Repeat to confirm override.");
-				warnedUser = true;
-			}
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
+					savedCmd = false;
+					savedImg = false;
+				}else 
+					savedCmd = true; 
+					savedImg = true;
+			}else continue;
+			break;
 		}	
+	}
+	
+	public void handleImg(int operation, BufferedImage buffImg, String FileName)
+	{
+		try 
+		{
+			if(operation == 1)
+			{
+				store.saveImg(buffImg, FileName);
+				savedImg = true;
+			}
+			else if(operation == 2)
+			{
+				if(store.checkSave(2, savedImg))
+				{
+					setBufferedImage(store.loadImg(FileName));
+				}	
+				savedImg = true;
+			}
+		}
+		
+		catch(Exception e)
+		{
+			displayMessage("File not found.");
+		}
+	}
+	
+	public void handleCmd(int operation, ArrayList<String> inCmdArray, String FileName)
+	{
+		try 
+		{
+			if(operation == 1)
+			{
+				for(int i = 0; i < inCmdArray.size(); i++)
+					 if(!inCmdArray.get(i).equals("savecommands") && !inCmdArray.get(i).equals("loadcommands"))
+						{
+						 store.saveString(inCmdArray.get(i), FileName);
+						}else continue;
+				savedCmd = true;
+			}
+			else if(operation == 2)
+			{
+				if(store.checkSave(1, savedCmd))
+				{
+					ArrayList<String> commands = store.loadString(FileName);
+					
+					for(int i = 0; i < commands.size(); i++)
+					{
+						processCommand(commands.get(i));
+					}
+					savedCmd = true;
+				}
+			}
+		}
+		
+		catch(Exception e)
+		{
+			displayMessage("File not found.");
+			return;
+		}
 	}
 }
