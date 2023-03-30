@@ -12,66 +12,70 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
-
-public class Store 
+public class Store
 {
 	public boolean checkSave(int type, boolean saved)
 	{
-		if(saved == false && type == 1)
+		if (!saved && type == 1)
 		{
-			int yesNo = JOptionPane.showConfirmDialog(null, "Current commandlist is not saved. Would you like to overwrite?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-			if(yesNo == JOptionPane.YES_OPTION)
+			int yesNo = JOptionPane.showConfirmDialog(null,
+					"Current commandlist is not saved. Would you like to overwrite?", "Warning",
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			if (yesNo == JOptionPane.YES_OPTION)
 			{
 				return true;
-			}else return false;
-		}
-		else if(saved == false && type == 2)
+			} else
+				return false;
+		} else if (!saved && type == 2)
 		{
-			int yesNo = JOptionPane.showConfirmDialog(null, "Current image is not saved. Would you like to overwrite?", "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-			if(yesNo == JOptionPane.YES_OPTION) 
+			int yesNo = JOptionPane.showConfirmDialog(null, "Current image is not saved. Would you like to overwrite?",
+					"Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			if (yesNo == JOptionPane.YES_OPTION)
 			{
 				return true;
-			}else return false;
-		}else return true;
+			} else
+				return false;
+		} else
+			return true;
 	}
-	
+
 	public void saveImg(BufferedImage buffImg, String FileName) throws IOException
-	{ 
-	    File outputFile = new File(FileName + ".png");
-	    ImageIO.write(buffImg, "png", outputFile);
+	{
+		File outputFile = new File(FileName + ".png");
+		ImageIO.write(buffImg, "png", outputFile);
 	}
-	
+
 	public BufferedImage loadImg(String FileName) throws IOException
 	{
 		File inputFile = new File(FileName + ".png");
 		BufferedImage buffImg = ImageIO.read(inputFile);
 		return buffImg;
 	}
-	
-	public void saveString(ArrayList<String> inputStrArray, String FileName) throws IOException 
+
+	public void saveString(ArrayList<String> inputStrArray, String FileName) throws IOException
 	{
 		BufferedWriter bw = new BufferedWriter(new FileWriter(FileName + ".txt"));
-		for(String line : inputStrArray)
+		for (String line : inputStrArray)
 		{
 			bw.write(line + "\n");
 		}
 		bw.close();
 	}
-	
+
 	public ArrayList<String> loadString(String FileName) throws IOException
 	{
 
-		ArrayList<String> outLineArray = new ArrayList<String>();
+		ArrayList<String> outLineArray = new ArrayList<>();
 		BufferedReader br = new BufferedReader(new FileReader(FileName + ".txt"));
-		
+
 		String line = br.readLine();
-		while (line != null) 
+		while (line != null)
 		{
 			outLineArray.add(line);
 			line = br.readLine();
 		}
 		br.close();
-		
-		return outLineArray;	
+
+		return outLineArray;
 	}
 }
