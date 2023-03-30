@@ -48,10 +48,13 @@ public class Store
 		return buffImg;
 	}
 	
-	public void saveString(String inputTxt, String FileName) throws IOException 
+	public void saveString(ArrayList<String> inputStrArray, String FileName) throws IOException 
 	{
 		BufferedWriter bw = new BufferedWriter(new FileWriter(FileName + ".txt"));
-		bw.write(inputTxt);
+		for(String line : inputStrArray)
+		{
+			bw.write(line + "\n");
+		}
 		bw.close();
 	}
 	
