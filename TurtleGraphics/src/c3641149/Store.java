@@ -16,26 +16,26 @@ public class Store
 {
 	public boolean checkSave(int type, boolean saved)
 	{
-		if (!saved && type == 1)
+		if(!saved && type == 1)
 		{
 			int yesNo = JOptionPane.showConfirmDialog(null,
 					"Current commandlist is not saved. Would you like to overwrite?", "Warning",
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-			if (yesNo == JOptionPane.YES_OPTION)
+			if(yesNo == JOptionPane.YES_OPTION)
 			{
 				return true;
-			} else return false;
+			}else return false;
 		} 
 		
-		else if (!saved && type == 2)
+		else if(!saved && type == 2)
 		{
 			int yesNo = JOptionPane.showConfirmDialog(null, "Current image is not saved. Would you like to overwrite?",
 					"Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-			if (yesNo == JOptionPane.YES_OPTION)
+			if(yesNo == JOptionPane.YES_OPTION)
 			{
 				return true;
-			} else return false;
-		} else return true;
+			}else return false;
+		}else return true;
 	}
 
 	public void saveImg(BufferedImage buffImg, String FileName) throws IOException
@@ -54,7 +54,7 @@ public class Store
 	public void saveString(ArrayList<String> inputStrArray, String FileName) throws IOException
 	{
 		BufferedWriter bw = new BufferedWriter(new FileWriter(FileName + ".txt"));
-		for (String line : inputStrArray)
+		for(String line : inputStrArray)
 		{
 			bw.write(line + "\n");
 		}
@@ -67,7 +67,7 @@ public class Store
 		BufferedReader br = new BufferedReader(new FileReader(FileName + ".txt"));
 
 		String line = br.readLine();
-		while (line != null)
+		while(line != null)
 		{
 			outputStringArray.add(line);
 			line = br.readLine();

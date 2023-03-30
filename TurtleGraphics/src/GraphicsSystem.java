@@ -59,9 +59,9 @@ public class GraphicsSystem extends LBUGraphics
 		List<String> paramArray = new ArrayList<>(Arrays.asList(PARAM_COMMANDS));
 		List<String> noParamArray = new ArrayList<>(Arrays.asList(NO_PARAM_COMMANDS));
 
-		if (paramArray.contains(cmd) && userInput.length > 1 || noParamArray.contains(cmd))
+		if(paramArray.contains(cmd) && userInput.length > 1 || noParamArray.contains(cmd))
 		{
-			if (userInput.length > 1)
+			if(userInput.length > 1)
 			{
 				cmdParam(PARAM_COMMANDS, allUserInput);
 				posCheck(turtlePos);
@@ -75,7 +75,7 @@ public class GraphicsSystem extends LBUGraphics
 			}
 		} 
 		
-		else if (paramArray.contains(cmd))
+		else if(paramArray.contains(cmd))
 		{
 			displayMessage("Command requires a parameter.");
 		} 
@@ -100,10 +100,9 @@ public class GraphicsSystem extends LBUGraphics
 
 		try
 		{
-			if (cmd.equals("triangle"))
+			if(cmd.equals("triangle"))
 			{
-				triangle(Integer.parseInt(userInput[1]), Integer.parseInt(userInput[2]),
-						Integer.parseInt(userInput[3]));
+				triangle(Integer.parseInt(userInput[1]), Integer.parseInt(userInput[2]), Integer.parseInt(userInput[3]));
 			}
 
 			else
@@ -114,14 +113,14 @@ public class GraphicsSystem extends LBUGraphics
 
 				paramArray[9] = () -> penColour(R, G, B);
 
-				if ((0 <= R && R <= 255) && (0 <= G && G <= 255) && (0 <= B && B <= 255))
+				if((0 <= R && R <= 255) && (0 <= G && G <= 255) && (0 <= B && B <= 255))
 				{
 					paramArray[9].run();
 				} else displayMessage("RGB values must be between 0 and 255.");
 			}
 		} 
 		
-		catch (ArrayIndexOutOfBoundsException e)
+		catch(ArrayIndexOutOfBoundsException e)
 		{
 			int numAmount = Integer.parseInt(userInput[1]);
 
@@ -134,23 +133,28 @@ public class GraphicsSystem extends LBUGraphics
 			paramArray[10] = () -> penWidth(numAmount);
 			paramArray[11] = () -> triangle(numAmount);
 
-			if ((cmd.equals("forward") || cmd.equals("backward")) && (0 >= numAmount || numAmount > 100))
+			if((cmd.equals("forward") || cmd.equals("backward")) && (0 >= numAmount || numAmount > 100))
 			{
 				displayMessage("Paramater must be an Integer between 1 and 100");
 				allUserInput.remove(allUserInput.size() - 1);
 			}
 			
-			else if ((cmd.equals("turnright") || cmd.equals("turnleft")) && (0 >= numAmount || numAmount > 360))
+			else if((cmd.equals("turnright") || cmd.equals("turnleft")) && (0 >= numAmount || numAmount > 360))
 			{
 				displayMessage("Paramater must be an Integer between 1 and 360");
 				allUserInput.remove(allUserInput.size() - 1);
 			}
 			
+			else if(userInput.length > 2)
+			{
+				displayMessage("Triangle command requires 1 or 3 paramaters.");
+			}
+			
 			else
 			{
-				for (int i = 0; i < ParamCommands.length; i++)
+				for(int i = 0; i < ParamCommands.length; i++)
 				{
-					if (cmd.equals(ParamCommands[i]))
+					if(cmd.equals(ParamCommands[i]))
 					{
 						paramArray[i].run();
 						savedCmd = false;
@@ -161,13 +165,13 @@ public class GraphicsSystem extends LBUGraphics
 			}
 		} 
 		
-		catch (Exception e)
+		catch(Exception e)
 		{
-			if (cmd.substring(0, 4).equals("save") || cmd.substring(0, 4).equals("load"))
+			if(cmd.substring(0, 4).equals("save") || cmd.substring(0, 4).equals("load"))
 			{
-				for (int i = 0; i < 4; i++)
+				for(int i = 0; i < 4; i++)
 				{
-					if (cmd.equals(ParamCommands[i]))
+					if(cmd.equals(ParamCommands[i]))
 					{
 						paramArray[i].run();
 						break;
@@ -202,12 +206,12 @@ public class GraphicsSystem extends LBUGraphics
 		};
 		noParamArray[8] = () -> clear();
 
-		for (int i = 0; i < noParamCommands.length; i++)
+		for(int i = 0; i < noParamCommands.length; i++)
 		{
-			if (cmd.equals(noParamCommands[i]))
+			if(cmd.equals(noParamCommands[i]))
 			{
 				noParamArray[i].run();
-				if (!cmd.equals("clear"))
+				if(!cmd.equals("clear"))
 				{
 					savedCmd = false;
 					savedImg = false;
@@ -218,7 +222,7 @@ public class GraphicsSystem extends LBUGraphics
 					savedCmd = true;
 					savedImg = true;
 				}
-			} else continue;
+			}else continue;
 		}
 	}
 
@@ -243,15 +247,15 @@ public class GraphicsSystem extends LBUGraphics
 	{
 		try
 		{
-			if (operation.substring(0, 4).equals("save"))
+			if(operation.substring(0, 4).equals("save"))
 			{
 				store.saveImg(buffImg, FileName);
 				savedImg = true;
 			} 
 			
-			else if (operation.substring(0, 4).equals("load"))
+			else if(operation.substring(0, 4).equals("load"))
 			{
-				if (store.checkSave(2, savedImg))
+				if(store.checkSave(2, savedImg))
 				{
 					setBufferedImage(store.loadImg(FileName));
 				}
@@ -259,7 +263,7 @@ public class GraphicsSystem extends LBUGraphics
 			}
 		}
 
-		catch (Exception e)
+		catch(Exception e)
 		{
 			displayMessage("File not found.");
 		}
@@ -271,28 +275,28 @@ public class GraphicsSystem extends LBUGraphics
 		{
 			ArrayList<String> cmdToSave = new ArrayList<>();
 
-			if (operation.substring(0, 4).equals("save"))
+			if(operation.substring(0, 4).equals("save"))
 			{
-				for (int i = 0; i < allCmdArray.size(); i++)
-					if (!allCmdArray.get(i).split(" ")[0].equals("savecommands") && !allCmdArray.get(i).split(" ")[0].equals("loadcommands"))
+				for(int i = 0; i < allCmdArray.size(); i++)
+					if(!allCmdArray.get(i).split(" ")[0].equals("savecommands") && !allCmdArray.get(i).split(" ")[0].equals("loadcommands"))
 					{
 						cmdToSave.add(allCmdArray.get(i));
-					} else continue;
+					}else continue;
 
 				if (cmdToSave.size() != 0)
 				{
 					store.saveString(cmdToSave, FileName);
 					savedCmd = true;
-				} else displayMessage("Nothing to save.");
+				}else displayMessage("Nothing to save.");
 			} 
 			
-			else if (operation.substring(0, 4).equals("load"))
+			else if(operation.substring(0, 4).equals("load"))
 			{
-				if (store.checkSave(1, savedCmd))
+				if(store.checkSave(1, savedCmd))
 				{
 					ArrayList<String> commands = store.loadString(FileName);
 
-					for (String command : commands)
+					for(String command : commands)
 					{
 						processCommand(command);
 					}
@@ -301,7 +305,7 @@ public class GraphicsSystem extends LBUGraphics
 			}
 		}
 
-		catch (Exception e)
+		catch(Exception e)
 		{
 			displayMessage("File not found.");
 			return;
