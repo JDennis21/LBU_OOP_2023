@@ -24,19 +24,18 @@ public class Store
 			if (yesNo == JOptionPane.YES_OPTION)
 			{
 				return true;
-			} else
-				return false;
-		} else if (!saved && type == 2)
+			} else return false;
+		} 
+		
+		else if (!saved && type == 2)
 		{
 			int yesNo = JOptionPane.showConfirmDialog(null, "Current image is not saved. Would you like to overwrite?",
 					"Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			if (yesNo == JOptionPane.YES_OPTION)
 			{
 				return true;
-			} else
-				return false;
-		} else
-			return true;
+			} else return false;
+		} else return true;
 	}
 
 	public void saveImg(BufferedImage buffImg, String FileName) throws IOException
@@ -64,18 +63,17 @@ public class Store
 
 	public ArrayList<String> loadString(String FileName) throws IOException
 	{
-
-		ArrayList<String> outLineArray = new ArrayList<>();
+		ArrayList<String> outputStringArray = new ArrayList<>();
 		BufferedReader br = new BufferedReader(new FileReader(FileName + ".txt"));
 
 		String line = br.readLine();
 		while (line != null)
 		{
-			outLineArray.add(line);
+			outputStringArray.add(line);
 			line = br.readLine();
 		}
 		br.close();
 
-		return outLineArray;
+		return outputStringArray;
 	}
 }

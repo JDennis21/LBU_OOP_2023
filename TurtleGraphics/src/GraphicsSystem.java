@@ -9,7 +9,7 @@ import java.util.List;
 import javax.swing.JFrame;
 
 import c3641149.Store;
-import c3641149.triangle;
+import c3641149.Triangle;
 import uk.ac.leedsbeckett.oop.LBUGraphics;
 
 public class GraphicsSystem extends LBUGraphics
@@ -17,7 +17,17 @@ public class GraphicsSystem extends LBUGraphics
 	private static final long serialVersionUID = 1L;
 
 	Store store = new Store();
+	
+	ArrayList<String> allUserInput = new ArrayList<>();
 
+	static final String[] PARAM_COMMANDS = new String[] {"saveimage", "loadimage", "savecommands", "loadcommands", "forward", "backward", "turnleft", "turnright",
+			"square", "pencolour", "penwidth", "triangle"};
+
+	static final String[] NO_PARAM_COMMANDS = new String[] {"about", "penup", "pendown", "black", "green", "red", "white", "reset", "clear"};
+
+	boolean savedCmd = true, savedImg = true;
+
+	
 	public static void main(String[] args)
 	{
 		new GraphicsSystem();
@@ -25,50 +35,52 @@ public class GraphicsSystem extends LBUGraphics
 
 	public GraphicsSystem()
 	{
-		// 800,400
 		JFrame MainFrame = new JFrame();
+		setPreferredSize(800, 400);
 		MainFrame.setLayout(new FlowLayout());
 		MainFrame.add(this);
 		MainFrame.pack();
 		MainFrame.setVisible(true);
+		MainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		penDown();
 	}
-
-	ArrayList<String> allUserInput = new ArrayList<>();
-
-	String[] paramCommands = new String[]
-	{ "saveimage", "loadimage", "savecommands", "loadcommands", "forward", "backward", "turnleft", "turnright",
-			"square", "pencolour", "penwidth", "triangle" };
-
-	String[] noParamCommands = new String[]
-	{ "about", "penup", "pendown", "black", "green", "red", "white", "reset", "clear" };
-
-	boolean savedCmd = true, savedImg = true;
 
 	@Override
 	public void processCommand(String command)
 	{
+		int [] turtlePos = new int[] {getxPos(), getyPos()};
+		handleImg("save", getBufferedImage(), "revertpanel");
+		
 		allUserInput.add(command.toLowerCase());
 
 		String[] userInput = command.toLowerCase().split(" ");
 		String cmd = userInput[0];
 
-		List<String> paramArray = new ArrayList<>(Arrays.asList(paramCommands));
-		List<String> noParamArray = new ArrayList<>(Arrays.asList(noParamCommands));
+		List<String> paramArray = new ArrayList<>(Arrays.asList(PARAM_COMMANDS));
+		List<String> noParamArray = new ArrayList<>(Arrays.asList(NO_PARAM_COMMANDS));
 
 		if (paramArray.contains(cmd) && userInput.length > 1 || noParamArray.contains(cmd))
 		{
 			if (userInput.length > 1)
 			{
-				cmdParam(paramCommands, allUserInput);
-			} else if (userInput.length == 1)
+				cmdParam(PARAM_COMMANDS, allUserInput);
+				posCheck(turtlePos);
+					
+			} 
+			
+			else if (userInput.length == 1)
 			{
-				cmdNoParam(cmd, noParamCommands, allUserInput);
+				cmdNoParam(cmd, NO_PARAM_COMMANDS, allUserInput);
+				posCheck(turtlePos);
 			}
-		} else if (paramArray.contains(cmd))
+		} 
+		
+		else if (paramArray.contains(cmd))
 		{
 			displayMessage("Command requires a parameter.");
-		} else
+		} 
+		
+		else
 		{
 			displayMessage("Command is not recongnised.");
 		}
@@ -80,11 +92,11 @@ public class GraphicsSystem extends LBUGraphics
 		String[] userInput = lastUserInput.toLowerCase().split(" ");
 		String cmd = userInput[0];
 
-		Runnable[] paramArray = new Runnable[paramCommands.length];
-		paramArray[0] = () -> handleImg(1, getBufferedImage(), userInput[1]);
-		paramArray[1] = () -> handleImg(2, getBufferedImage(), userInput[1]);
-		paramArray[2] = () -> handleCmd(1, allUserInput, userInput[1]);
-		paramArray[3] = () -> handleCmd(2, allUserInput, userInput[1]);
+		Runnable[] paramArray = new Runnable[PARAM_COMMANDS.length];
+		paramArray[0] = () -> handleImg("save", getBufferedImage(), userInput[1]);
+		paramArray[1] = () -> handleImg("load", getBufferedImage(), userInput[1]);
+		paramArray[2] = () -> handleCmd("save", allUserInput, userInput[1]);
+		paramArray[3] = () -> handleCmd("load", allUserInput, userInput[1]);
 
 		try
 		{
@@ -105,10 +117,11 @@ public class GraphicsSystem extends LBUGraphics
 				if ((0 <= R && R <= 255) && (0 <= G && G <= 255) && (0 <= B && B <= 255))
 				{
 					paramArray[9].run();
-				} else
-					displayMessage("RGB values must be between 0 and 255.");
+				} else displayMessage("RGB values must be between 0 and 255.");
 			}
-		} catch (ArrayIndexOutOfBoundsException e)
+		} 
+		
+		catch (ArrayIndexOutOfBoundsException e)
 		{
 			int numAmount = Integer.parseInt(userInput[1]);
 
@@ -117,17 +130,24 @@ public class GraphicsSystem extends LBUGraphics
 			paramArray[6] = () -> turnLeft(numAmount);
 			paramArray[7] = () -> turnRight(numAmount);
 			paramArray[8] = () -> square(numAmount);
-			paramArray[9] = () ->
-			{
-			};
+			paramArray[9] = () ->{};
 			paramArray[10] = () -> penWidth(numAmount);
 			paramArray[11] = () -> triangle(numAmount);
 
 			if ((cmd.equals("forward") || cmd.equals("backward")) && (0 >= numAmount || numAmount > 100))
+			{
 				displayMessage("Paramater must be an Integer between 1 and 100");
+				allUserInput.remove(allUserInput.size() - 1);
+			}
+			
 			else if ((cmd.equals("turnright") || cmd.equals("turnleft")) && (0 >= numAmount || numAmount > 360))
+			{
 				displayMessage("Paramater must be an Integer between 1 and 360");
+				allUserInput.remove(allUserInput.size() - 1);
+			}
+			
 			else
+			{
 				for (int i = 0; i < ParamCommands.length; i++)
 				{
 					if (cmd.equals(ParamCommands[i]))
@@ -136,10 +156,12 @@ public class GraphicsSystem extends LBUGraphics
 						savedCmd = false;
 						savedImg = false;
 						break;
-					} else
-						continue;
+					} else continue;
 				}
-		} catch (Exception e)
+			}
+		} 
+		
+		catch (Exception e)
 		{
 			if (cmd.substring(0, 4).equals("save") || cmd.substring(0, 4).equals("load"))
 			{
@@ -149,11 +171,15 @@ public class GraphicsSystem extends LBUGraphics
 					{
 						paramArray[i].run();
 						break;
-					} else
-						continue;
+					} else continue;
 				}
-			} else
+			} 
+			
+			else 
+			{
 				displayMessage("Parameter requires Integer.");
+				allUserInput.remove(allUserInput.size() - 1);
+			}
 		}
 	}
 
@@ -185,24 +211,45 @@ public class GraphicsSystem extends LBUGraphics
 				{
 					savedCmd = false;
 					savedImg = false;
-				} else
+				} 
+				
+				else
+				{
 					savedCmd = true;
-				savedImg = true;
-			} else
-				continue;
-			break;
+					savedImg = true;
+				}
+			} else continue;
 		}
 	}
 
-	private void handleImg(int operation, BufferedImage buffImg, String FileName)
+	private void posCheck(int[] turtlePos)
+	{	
+		if((getxPos() > 800 || getxPos() < 0) || (getyPos() > 400 || getyPos() < 0))
+		{
+			displayMessage("Turtle out of bounds.");
+			
+			savedImg = true;
+			handleImg("load", getBufferedImage(), "revertpanel");
+			savedImg = false;
+			
+			setxPos(turtlePos[0]);
+			setyPos(turtlePos[1]);
+			
+			allUserInput.remove(allUserInput.size() - 1);
+		}
+	}
+	
+	private void handleImg(String operation, BufferedImage buffImg, String FileName)
 	{
 		try
 		{
-			if (operation == 1)
+			if (operation.substring(0, 4).equals("save"))
 			{
 				store.saveImg(buffImg, FileName);
 				savedImg = true;
-			} else if (operation == 2)
+			} 
+			
+			else if (operation.substring(0, 4).equals("load"))
 			{
 				if (store.checkSave(2, savedImg))
 				{
@@ -218,29 +265,28 @@ public class GraphicsSystem extends LBUGraphics
 		}
 	}
 
-	private void handleCmd(int operation, ArrayList<String> allCmdArray, String FileName)
+	private void handleCmd(String operation, ArrayList<String> allCmdArray, String FileName)
 	{
 		try
 		{
 			ArrayList<String> cmdToSave = new ArrayList<>();
 
-			if (operation == 1)
+			if (operation.substring(0, 4).equals("save"))
 			{
 				for (int i = 0; i < allCmdArray.size(); i++)
-					if (!allCmdArray.get(i).split(" ")[0].equals("savecommands")
-							&& !allCmdArray.get(i).split(" ")[0].equals("loadcommands"))
+					if (!allCmdArray.get(i).split(" ")[0].equals("savecommands") && !allCmdArray.get(i).split(" ")[0].equals("loadcommands"))
 					{
 						cmdToSave.add(allCmdArray.get(i));
-					} else
-						continue;
+					} else continue;
 
 				if (cmdToSave.size() != 0)
 				{
 					store.saveString(cmdToSave, FileName);
 					savedCmd = true;
-				} else
-					displayMessage("Nothing to save.");
-			} else if (operation == 2)
+				} else displayMessage("Nothing to save.");
+			} 
+			
+			else if (operation.substring(0, 4).equals("load"))
 			{
 				if (store.checkSave(1, savedCmd))
 				{
@@ -261,19 +307,7 @@ public class GraphicsSystem extends LBUGraphics
 			return;
 		}
 	}
-
-	private void square(int sideLength)
-	{
-		forward(sideLength);
-		turnRight(90);
-		forward(sideLength);
-		turnRight(90);
-		forward(sideLength);
-		turnRight(90);
-		forward(sideLength);
-		turnRight(90);
-	}
-
+	
 	private void penColour(int R, int G, int B)
 	{
 		Color col = new Color(R, G, B);
@@ -283,6 +317,15 @@ public class GraphicsSystem extends LBUGraphics
 	private void penWidth(int penWidth)
 	{
 		setStroke(penWidth);
+	}
+	
+	private void square(int sideLength)
+	{
+		for(int i = 0; i < 4; i++)
+		{
+			forward(sideLength);
+			turnRight(90);
+		}
 	}
 
 	private void triangle(int sideLength)
@@ -300,32 +343,30 @@ public class GraphicsSystem extends LBUGraphics
 
 	private void triangle(int sideA, int sideB, int sideC)
 	{
-		triangle t = new triangle();
+		Triangle t = new Triangle();
 		
 		int[] sides = new int[] {sideA, sideB, sideC};
 		Arrays.sort(sides);
 		
-		for(int i = 0; i < t.triangleDegrees(sideA, sideB, sideC).length; i++)
-		{
-			
-		}
 		int[] angles = t.triangleDegrees(sides[1], sides[0], sides[2]);
-		
-		for(int degree: angles)
-		{
-			System.out.println(degree);
-		}
 		
 		if(angles[0] != 0 && angles[1] != 0 && angles[2] != 0)
 		{
-		forward(sideA / 2);
-		turnLeft(180 - angles[3]);
-		forward(sideB);
-		turnLeft(180 - angles[2]);
-		forward(sideC);
-		turnLeft(180 - angles[1]);
-		forward(sideA / 2);
-		turnLeft(90);
+			turnRight(90);
+			forward(sides[2] / 2);
+			turnLeft(180 - angles[1]);
+			forward(sides[1]);
+			turnLeft(180 - angles[2]);
+			forward(sides[0]);
+			turnLeft(180 - angles[0]);
+			forward(sides[2] / 2);
+			turnLeft(90);
+		}
+		
+		else 
+		{
+			displayMessage("Unable to create triangle with these sides.");
+			allUserInput.remove(allUserInput.size() - 1);
 		}
 	}
 }
