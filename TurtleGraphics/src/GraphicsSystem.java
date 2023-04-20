@@ -18,13 +18,16 @@ public class GraphicsSystem extends LBUGraphics
 
 	Store store = new Store();
 	
+	
 	ArrayList<String> allUserInput = new ArrayList<>();
 
+	
 	static final String[] PARAM_COMMANDS = new String[] {"saveimage", "loadimage", "savecommands", "loadcommands", "forward", "backward", "turnleft", "turnright",
 			"square", "pencolour", "penwidth", "triangle"};
 
 	static final String[] NO_PARAM_COMMANDS = new String[] {"about", "penup", "pendown", "black", "green", "red", "white", "reset", "clear"};
 
+	
 	boolean savedCmd = true, savedImg = true;
 
 	
@@ -64,8 +67,7 @@ public class GraphicsSystem extends LBUGraphics
 			if(userInput.length > 1)
 			{
 				cmdParam(PARAM_COMMANDS, allUserInput);
-				posCheck(turtlePos);
-					
+				posCheck(turtlePos);	
 			} 
 			
 			else if (userInput.length == 1)
