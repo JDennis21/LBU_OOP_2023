@@ -228,6 +228,88 @@ public class GraphicsSystem extends LBUGraphics
 		}
 	}
 
+	private void param(String cmd, String[] noParamCommands, String[] ParamCommands, ArrayList<String> allUserInput)
+	{
+		String lastUserInput = allUserInput.get(allUserInput.size() - 1);
+		String[] userInput = lastUserInput.toLowerCase().split(" ");
+
+		Runnable[] paramArray = new Runnable[PARAM_COMMANDS.length];
+		paramArray[0] = () -> handleImg("save", getBufferedImage(), userInput[1]);
+		paramArray[1] = () -> handleImg("load", getBufferedImage(), userInput[1]);
+		paramArray[2] = () -> handleCmd("save", allUserInput, userInput[1]);
+		paramArray[3] = () -> handleCmd("load", allUserInput, userInput[1]);
+		
+		if (cmd.length() - cmd.replaceAll(" ", "").length() == 1)
+		{
+			try
+			{
+				
+				int numAmount = Integer.parseInt(userInput[1]);
+
+				paramArray[4] = () -> forward(numAmount);
+				paramArray[5] = () -> forward(-numAmount);
+				paramArray[6] = () -> turnLeft(numAmount);
+				paramArray[7] = () -> turnRight(numAmount);
+				paramArray[8] = () -> square(numAmount);
+				paramArray[9] = () ->{};
+				paramArray[10] = () -> penWidth(numAmount);
+				paramArray[11] = () -> triangle(numAmount);
+
+				if((cmd.equals("forward") || cmd.equals("backward")) && (0 >= numAmount || numAmount > 100))
+				{
+					displayMessage("Paramater must be an Integer between 1 and 100");
+					allUserInput.remove(allUserInput.size() - 1);
+				}
+				
+				else if((cmd.equals("turnright") || cmd.equals("turnleft")) && (0 >= numAmount || numAmount > 360))
+				{
+					displayMessage("Paramater must be an Integer between 1 and 360");
+					allUserInput.remove(allUserInput.size() - 1);
+				}
+				
+				else
+				{
+					for(int i = 0; i < ParamCommands.length; i++)
+					{
+						if(cmd.equals(ParamCommands[i]))
+						{
+							paramArray[i].run();
+							savedCmd = false;
+							savedImg = false;
+							break;
+						} else continue;
+					}
+				}
+			} 
+			
+			catch(Exception e)
+			{
+				if(cmd.substring(0, 4).equals("save") || cmd.substring(0, 4).equals("load"))
+				{
+					for(int i = 0; i < 4; i++)
+					{
+						if(cmd.equals(ParamCommands[i]))
+						{
+							paramArray[i].run();
+							break;
+						} else continue;
+					}
+				} 
+				
+				else 
+				{
+					displayMessage("Parameter requires Integer.");
+					allUserInput.remove(allUserInput.size() - 1);
+				}
+			}
+		}
+	
+		else
+		{
+			displayMessage("Triangle command requires 1 or 3 paramaters.");
+		}
+	}
+	
 	private void posCheck(int[] turtlePos)
 	{	
 		if((getxPos() > 800 || getxPos() < 0) || (getyPos() > 400 || getyPos() < 0))
