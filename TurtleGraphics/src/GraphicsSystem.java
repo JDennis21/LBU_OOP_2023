@@ -26,7 +26,7 @@ public class GraphicsSystem extends LBUGraphics
 
 	boolean savedCmd = true, savedImg = true;
 	
-	protected static void main(String[] args)
+	public static void main(String[] args)
 	{
 		new GraphicsSystem();
 	}
@@ -60,14 +60,12 @@ public class GraphicsSystem extends LBUGraphics
 		{
 			if(setMethodArray(userInput, allUserInput, methodArray))
 			{
-				BufferedImage revertPanel = getBufferedImage();
+				handleImg("panel", getBufferedImage(), "revertpanel");
 				int [] turtlePos = new int[] {getxPos(), getyPos()};
 				
 				runMethod(userInput[0], methodArray);
-				posCheck(revertPanel, turtlePos);
-			}
-			
-			else allUserInput.remove(userInput[0]);
+				posCheck(turtlePos);
+			}else allUserInput.remove(userInput[0]);
 		} 
 		
 		else
@@ -100,8 +98,14 @@ public class GraphicsSystem extends LBUGraphics
 				setPenColour(Color.red);
 				penWidth(1);
 			};
-			methodArray[8] = () -> clear();
-			
+			methodArray[8] = () -> 
+			{
+			    if(store.checkSave(2, savedImg)) 
+			    {
+			        clear();
+			        savedImg = true;
+			    }
+			};
 			return true;
 		}
 		
@@ -231,14 +235,14 @@ public class GraphicsSystem extends LBUGraphics
 		}
 	}
 	
-	private void posCheck(BufferedImage revertPanel, int[] turtlePos)
+	private void posCheck(int[] turtlePos)
 	{	
 		if((getxPos() > 800 || getxPos() < 0) || (getyPos() > 400 || getyPos() < 0))
 		{
 			displayMessage("Turtle out of bounds.");
 			
 			savedImg = true;
-			setBufferedImage(revertPanel);
+			handleImg("load", getBufferedImage(), "revertpanel");
 			savedImg = false;
 			
 			setxPos(turtlePos[0]);
@@ -265,6 +269,11 @@ public class GraphicsSystem extends LBUGraphics
 					setBufferedImage(store.loadImg(FileName));
 				}
 				savedImg = true;
+			}
+			
+			else if(operation.contains("panel"));
+			{
+				store.saveImg(buffImg, FileName);
 			}
 		}
 
@@ -296,6 +305,7 @@ public class GraphicsSystem extends LBUGraphics
 					for(String command : store.loadString(FileName))
 					{
 						processCommand(command);
+						System.out.println(command);
 					}
 					savedCmd = true;
 				}
