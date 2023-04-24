@@ -2,6 +2,7 @@
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,12 +26,12 @@ public class GraphicsSystem extends LBUGraphics
 
 	boolean savedCmd = true, savedImg = true;
 	
-	public static void main(String[] args)
+	protected static void main(String[] args)
 	{
 		new GraphicsSystem();
 	}
 
-	public GraphicsSystem()
+	protected GraphicsSystem()
 	{
 		JFrame MainFrame = new JFrame();
 		setPreferredSize(800, 400);
@@ -39,70 +40,48 @@ public class GraphicsSystem extends LBUGraphics
 		MainFrame.pack();
 		MainFrame.setVisible(true);
 		MainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		about();
+		penWidth(1);
+		clear();
 		penDown();
 	}
 
 	@Override
 	public void processCommand(String command)
 	{
-		int [] turtlePos = new int[] {getxPos(), getyPos()};
-		handleImg("save", getBufferedImage(), "revertpanel");
-		
 		allUserInput.add(command.toLowerCase());
 
 		String[] userInput = command.toLowerCase().split(" ");
-		String cmd = userInput[0];
 
 		List<String> commandsArrayList = new ArrayList<>(Arrays.asList(COMMANDS));
 		Runnable[] methodArray = new Runnable[COMMANDS.length];
 
-		if(commandsArrayList.contains(cmd))
+		if(commandsArrayList.contains(userInput[0]))
 		{
-			if(setMethodArray(allUserInput, methodArray))
+			if(setMethodArray(userInput, allUserInput, methodArray))
 			{
-				try
-				{
-					for(int i = 0; i < COMMANDS.length; i++)
-					{
-						if(cmd.equals(COMMANDS[i]))
-						{
-							methodArray[i].run();
-							displayMessage("LBUgraphics V4.4");
-							if(cmd.equals("clear") || cmd.substring(0, 4).equals("save") || cmd.substring(0, 4).equals("load"))
-							{
-								savedCmd = true;
-								savedImg = true;
-							} 
-							
-							else
-							{
-								savedCmd = false;
-								savedImg = false;
-							}
-						}else continue;
-					}
-					posCheck(turtlePos);	
-				}
+				BufferedImage revertPanel = getBufferedImage();
+				int [] turtlePos = new int[] {getxPos(), getyPos()};
 				
-				catch(java.lang.NullPointerException e)
-				{
-					displayMessage("Command requires a parameter.");
-				}
+				runMethod(userInput[0], methodArray);
+				posCheck(revertPanel, turtlePos);
 			}
+			
+			else allUserInput.remove(userInput[0]);
 		} 
 		
 		else
 		{
 			displayMessage("Command is not recongnised.");
+			allUserInput.remove(userInput[0]);
 		}
 	}
 
-	private boolean setMethodArray(ArrayList<String> allUserInput, Runnable[] methodArray)
+	private boolean setMethodArray(String[] userInput, ArrayList<String> allUserInput, Runnable[] methodArray)
 	{
-	String[] userInput = allUserInput.get(allUserInput.size() - 1).toLowerCase().split(" ");
 	String cmd = userInput[0];
 	
-	String[] oneParam = {"saveimage", "loadimage", "savecommands", "loadcommands", "forward", "backward", "turnleft", "turnright", "square", "penwidth"};
+	String[] oneParam = {"saveimage", "loadimage", "savecommands", "loadcommands", "forward", "backward", "turnleft", "turnright", "square", "penwidth", "triangle"};
 	String[] threeParam = {"triangle", "pencolour"};
 	
 		if(userInput.length == 1)
@@ -114,7 +93,7 @@ public class GraphicsSystem extends LBUGraphics
 			methodArray[4] = () -> setPenColour(Color.green);
 			methodArray[5] = () -> setPenColour(Color.red);
 			methodArray[6] = () -> setPenColour(Color.white);
-			methodArray[7] = () ->
+			methodArray[7] = () -> 
 			{
 				reset();
 				penDown();
@@ -162,23 +141,20 @@ public class GraphicsSystem extends LBUGraphics
 					else if((cmd.equals("forward") || cmd.equals("backward")) && (0 >= numAmount || numAmount > 100))
 					{
 						displayMessage("Command must be an Integer between 1 and 100");
-						allUserInput.remove(allUserInput.size() - 1);
 						return false;
 					}
 					
 					else if((cmd.equals("turnright") || cmd.equals("turnleft")) && (0 >= numAmount || numAmount > 360))
 					{
 						displayMessage("Command must be an Integer between 1 and 360");
-						allUserInput.remove(allUserInput.size() - 1);
 						return false;
 					}else return true;
-				}
+				}else return true;
 			}
 			
 			catch(NumberFormatException e)
 			{
 				displayMessage("Command requires Integer.");
-				allUserInput.remove(allUserInput.size() - 1);	
 				return false;
 			}
 		}
@@ -192,7 +168,14 @@ public class GraphicsSystem extends LBUGraphics
 					displayMessage("Command does not require multiple parameters");
 					return false;
 				}
-				else if(Arrays.asList(threeParam).contains(cmd) && userInput.length > 4)
+				
+				else if(cmd.equals("triangle") && userInput.length != 4)
+				{
+					displayMessage("Triangle command requires 1 or 3 parameters.");
+					return false;
+				}
+				
+				else if(Arrays.asList(threeParam).contains(cmd) && userInput.length != 4)
 				{
 					displayMessage("Command requires 3 parameters.");
 					return false;
@@ -204,28 +187,58 @@ public class GraphicsSystem extends LBUGraphics
 				
 				methodArray[19] = () -> triangle(num1, num2, num3); 
 				methodArray[20] = () -> penColour(num1, num2, num3); 
-				
 				return true;
 			}
 			
 			catch(NumberFormatException e)
 			{
 				displayMessage("Command requires Integer.");
-				allUserInput.remove(allUserInput.size() - 1);	
 				return false;
 			}
 		}
 		return false;
 	}
 	
-	private void posCheck(int[] turtlePos)
+	private void runMethod(String cmd, Runnable[] methodArray)
+	{
+		try
+		{
+			for(int i = 0; i < COMMANDS.length; i++)
+			{
+				if(cmd.equals(COMMANDS[i]))
+				{
+					displayMessage("LBUGraphics V4.4");
+					methodArray[i].run();
+					if(cmd.equals("clear"))
+					{
+						savedCmd = true;
+						savedImg = true;
+					} 
+					
+					else
+					{
+						savedCmd = false;
+						savedImg = false;
+					}
+					break;
+				}else continue;
+			}	
+		}
+		
+		catch(java.lang.NullPointerException e)
+		{
+			displayMessage("Command requires a parameter.");
+		}
+	}
+	
+	private void posCheck(BufferedImage revertPanel, int[] turtlePos)
 	{	
 		if((getxPos() > 800 || getxPos() < 0) || (getyPos() > 400 || getyPos() < 0))
 		{
 			displayMessage("Turtle out of bounds.");
 			
 			savedImg = true;
-			handleImg("load", getBufferedImage(), "revertpanel");
+			setBufferedImage(revertPanel);
 			savedImg = false;
 			
 			setxPos(turtlePos[0]);
@@ -265,19 +278,13 @@ public class GraphicsSystem extends LBUGraphics
 	{
 		try
 		{
-			ArrayList<String> cmdToSave = new ArrayList<>();
+			allCmdArray.removeIf(cmd -> cmd.contains("save") || cmd.contains("load"));
 
 			if(operation.substring(0, 4).equals("save"))
 			{
-				for(int i = 0; i < allCmdArray.size(); i++)
-					if(!allCmdArray.get(i).split(" ")[0].equals("savecommands") && !allCmdArray.get(i).split(" ")[0].equals("loadcommands"))
-					{
-						cmdToSave.add(allCmdArray.get(i));
-					}else continue;
-
-				if (cmdToSave.size() != 0)
+				if (allCmdArray.size() != 0)
 				{
-					store.saveString(cmdToSave, FileName);
+					store.saveString(allCmdArray, FileName);
 					savedCmd = true;
 				}else displayMessage("Nothing to save.");
 			} 
@@ -286,9 +293,7 @@ public class GraphicsSystem extends LBUGraphics
 			{
 				if(store.checkSave(1, savedCmd))
 				{
-					ArrayList<String> commands = store.loadString(FileName);
-
-					for(String command : commands)
+					for(String command : store.loadString(FileName))
 					{
 						processCommand(command);
 					}
@@ -297,7 +302,7 @@ public class GraphicsSystem extends LBUGraphics
 			}
 		}
 
-		catch(Exception e)
+		catch(IOException e)
 		{
 			displayMessage("File not found.");
 			return;
