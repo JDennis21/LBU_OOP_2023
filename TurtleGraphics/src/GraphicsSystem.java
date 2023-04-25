@@ -57,7 +57,7 @@ public class GraphicsSystem extends LBUGraphics
 
 		if(methodMap.containsKey(userInput[0]))
 		{
-			if(boundsCheck(userInput))
+			if(paramCheck(userInput))
 			{
 				handleImg("panel", getBufferedImage(), "revertpanel");
 				int [] turtlePos = new int[] {getxPos(), getyPos()};
@@ -73,7 +73,38 @@ public class GraphicsSystem extends LBUGraphics
 			allUserInput.remove(userInput[0]);
 		}
 	}
-
+	
+	public void runMethod(String[] userInput)
+	{
+		String cmd = userInput[0];
+		String[] parameters = Arrays.copyOfRange(userInput, 1, userInput.length);
+		
+		if(cmd.equals("triangle"))
+		{
+			if(userInput.length == 4)
+			{
+				triangle(Integer.parseInt(parameters[0]), Integer.parseInt(parameters[1]), Integer.parseInt(parameters[2]));
+			}else triangle(Integer.parseInt(parameters[0]));
+		}
+		
+		else
+		{
+			methodMap.get(cmd).accept(parameters);
+		}
+		
+		if(cmd.equals("clear"))
+		{
+			savedCmd = true;
+			savedImg = true;
+		} 
+		
+		else
+		{
+			savedCmd = false;
+			savedImg = false;
+		}
+	}
+	
 	public void setMethodMap(ArrayList<String> allUserInput, Map<String, Consumer<String[]>> methodMap)
 	{	
 		methodMap.put("penup",   (sArray) -> penUp());
@@ -103,100 +134,97 @@ public class GraphicsSystem extends LBUGraphics
 		methodMap.put("pencolour", (sArray) -> penColour(Integer.parseInt(sArray[0]), Integer.parseInt(sArray[1]), Integer.parseInt(sArray[2])));
 	}
 	
-	public boolean boundsCheck(String[] userInput)
+	public boolean paramCheck(String[] userInput)
 	{
-	String cmd = userInput[0];
+		String cmd = userInput[0];
+		
+		String[] oneParam = {"saveimage", "loadimage", "savecommands", "loadcommands", "forward", "backward", "turnleft", "turnright", "square", "penwidth", "triangle"};
+		String[] threeParam = {"triangle", "pencolour"};
+		
+		if(userInput.length == 1 && !(Arrays.asList(oneParam).contains(cmd)) && !(Arrays.asList(threeParam).contains(cmd))) 
+		{
+			return true;
+		} 
+		
+		else if(Arrays.asList(oneParam).contains(cmd) && userInput.length == 2) 
+		{
+			return boundsCheck(cmd, userInput);
+		} 
+		 
+		else if(Arrays.asList(threeParam).contains(cmd) && userInput.length == 4) 
+		{
+			return boundsCheck(cmd, userInput);
+		}
+		else if(cmd.equals("triangle") && userInput.length != 2 && userInput.length != 4)
+		{
+			displayMessage("Triangle requires one or three parametes.");
+			return false;
+		}
+		
+		else if(Arrays.asList(oneParam).contains(cmd) && userInput.length != 2) 
+		{
+			displayMessage("Command requires a parameter");
+			return false;
+		} 
+		
+		else if(Arrays.asList(threeParam).contains(cmd) && userInput.length != 4) 
+		{
+			displayMessage("Command requires three parameters");
+			return false;
+		}	
+		
+		else if(userInput.length != 1) 
+		{
+			displayMessage("Command requires no parameters.");
+			return false;
+		}else return false;
+	}
 	
-	String[] oneParam = {"saveimage", "loadimage", "savecommands", "loadcommands", "forward", "backward", "turnleft", "turnright", "square", "penwidth", "triangle"};
-	String[] threeParam = {"triangle", "pencolour"};
-
+	public boolean boundsCheck(String cmd, String[] userInput)
+	{
 		try
 		{
-			if(userInput.length == 2)
-			{		
-				if(!cmd.contains("save") && !cmd.contains("load"))
-				{
-					int numAmount = Integer.parseInt(userInput[1]);
-					
-					if(!Arrays.asList(oneParam).contains(cmd))
-					{
-						displayMessage("Command requires no parameters.");
-						return false;
-					}
-					
-					else if(userInput.length > 2 && cmd.equals("triangle"))
-					{
-						displayMessage("Triangle command requires 1 or 3 paramaters.");
-						return false;
-					}
-					
-					else if((cmd.equals("forward") || cmd.equals("backward")) && (0 >= numAmount || numAmount > 100))
-					{
-						displayMessage("Command must be an Integer between 1 and 100");
-						return false;
-					}
-					
-					else if((cmd.equals("turnright") || cmd.equals("turnleft")) && (0 >= numAmount || numAmount > 360))
-					{
-						displayMessage("Command must be an Integer between 1 and 360");
-						return false;
-					}else return true;
-				}else return true;
-			}
+			int numAmount = Integer.parseInt(userInput[1]);
 			
-			else if(userInput.length > 2)
-			{	
-				if(!Arrays.asList(threeParam).contains(cmd))
-				{
-					displayMessage("Command does not require multiple parameters");
-					return false;
-				}
-				
-				else if(cmd.equals("triangle") && userInput.length != 4)
-				{
-					displayMessage("Triangle command requires 1 or 3 parameters.");
-					return false;
-				}
-				
-				else if(Arrays.asList(threeParam).contains(cmd) && userInput.length != 4)
-				{
-					displayMessage("Command requires 3 parameters.");
-					return false;
-				}else return true;
-			}
-			
-			else
+			if((cmd.equals("forward") || cmd.equals("backward")) && (0 >= numAmount || numAmount > 100))
 			{
-			displayMessage("Command requires parameters");
-			return false;
+				displayMessage("Parameter must be an Integer between 1 and 100");
+				return false;
 			}
+			
+			else if((cmd.equals("turnright") || cmd.equals("turnleft")) && (0 >= numAmount || numAmount > 360))
+			{
+				displayMessage("Parameter must be an Integer between 1 and 360");
+				return false;
+			}
+			
+			else if(cmd.equals("pencolour"))
+			{
+				int num2 = Integer.parseInt(userInput[2]);
+				int num3 = Integer.parseInt(userInput[3]);
+				
+				if(0 >= numAmount || numAmount > 255 || 0 >= num2 || num2 > 255 || 0 >= num3 || num3 > 255)
+				{
+					displayMessage("RGB values must be between 1 and 255");
+					return false;
+				}
+			}else return true;
 		}
 		
 		catch(NumberFormatException e)
 		{
+			if(cmd.contains("save") || cmd.contains("load"))
+			{
+				return true;
+			}
+			
+			else
+			{
 			displayMessage("Command requires Integer.");
 			return false;
+			}
 		}
-	}
-	
-	public void runMethod(String[] userInput)
-	{
-		String cmd = userInput[0];
-		String[] parameters = Arrays.copyOfRange(userInput, 1, userInput.length);
-		
-		methodMap.get(cmd).accept(parameters);
-		
-		if(cmd.equals("clear"))
-		{
-			savedCmd = true;
-			savedImg = true;
-		} 
-		
-		else
-		{
-			savedCmd = false;
-			savedImg = false;
-		}
+		return false;
 	}
 	
 	public void posCheck(int[] turtlePos)
