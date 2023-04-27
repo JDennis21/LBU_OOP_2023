@@ -90,6 +90,7 @@ public class GraphicsSystem extends LBUGraphics
 		else
 		{
 			methodMap.get(cmd).accept(parameters);
+			displayMessage("LBUGraphics V4.4");
 		}
 		
 		if(cmd.equals("clear"))
