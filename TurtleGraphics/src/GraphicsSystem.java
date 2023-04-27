@@ -43,7 +43,8 @@ public class GraphicsSystem extends LBUGraphics
 		MainFrame.pack();
 		MainFrame.setVisible(true);
 		MainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		about();
+		super.about();
+		setStroke(1);
 		clear();
 		penDown();
 	}
@@ -81,6 +82,7 @@ public class GraphicsSystem extends LBUGraphics
 		
 		if(cmd.equals("triangle"))
 		{
+			displayMessage("LBUGraphics V4.4");
 			if(userInput.length == 4)
 			{
 				triangle(Integer.parseInt(parameters[0]), Integer.parseInt(parameters[1]), Integer.parseInt(parameters[2]));
@@ -89,8 +91,8 @@ public class GraphicsSystem extends LBUGraphics
 		
 		else
 		{
-			methodMap.get(cmd).accept(parameters);
 			displayMessage("LBUGraphics V4.4");
+			methodMap.get(cmd).accept(parameters);
 		}
 		
 		if(cmd.equals("clear"))
@@ -99,7 +101,7 @@ public class GraphicsSystem extends LBUGraphics
 			savedImg = true;
 		} 
 		
-		else
+		else if(!cmd.contains("image") && !cmd.contains("command"))
 		{
 			savedCmd = false;
 			savedImg = false;
@@ -128,7 +130,7 @@ public class GraphicsSystem extends LBUGraphics
 		methodMap.put("turnleft",  (sArray) -> turnLeft(Integer.parseInt(sArray[0])));
 		methodMap.put("turnright", (sArray) -> turnRight(Integer.parseInt(sArray[0])));
 		methodMap.put("square",    (sArray) -> square(Integer.parseInt(sArray[0])));
-		methodMap.put("penwidth",  (sArray) -> penWidth(Integer.parseInt(sArray[0])));
+		methodMap.put("penwidth",  (sArray) -> setStroke(Integer.parseInt(sArray[0])));
 		methodMap.put("triangle",  (sArray) -> triangle(Integer.parseInt(sArray[0])));
 		
 		methodMap.put("triangle",  (sArray) -> triangle(Integer.parseInt(sArray[0]), Integer.parseInt(sArray[1]), Integer.parseInt(sArray[2])));
@@ -234,9 +236,16 @@ public class GraphicsSystem extends LBUGraphics
 		{
 			displayMessage("Turtle out of bounds.");
 			
+			if(savedImg == true)
+			{
+				handleImg("load", getBufferedImage(), "revertpanel");
+			}
+			else
+			{
 			savedImg = true;
 			handleImg("load", getBufferedImage(), "revertpanel");
 			savedImg = false;
+			}
 			
 			setxPos(turtlePos[0]);
 			setyPos(turtlePos[1]);
@@ -260,8 +269,8 @@ public class GraphicsSystem extends LBUGraphics
 				if(store.checkSave(2, savedImg))
 				{
 					setBufferedImage(store.loadImg(FileName));
+					savedImg = true;
 				}
-				savedImg = true;
 			}
 			
 			else if(operation.contains("panel"));
@@ -318,11 +327,6 @@ public class GraphicsSystem extends LBUGraphics
 		setPenColour(col);
 	}
 
-	public void penWidth(int penWidth)
-	{
-		setStroke(penWidth);
-	}
-	
 	public void square(int sideLength)
 	{
 		for(int i = 0; i < 4; i++)
@@ -380,13 +384,14 @@ public class GraphicsSystem extends LBUGraphics
 		super.reset();
 		penDown();
 		setPenColour(Color.red);
-		penWidth(1);
+		setStroke(1);
 	}
 	
 	@Override
 	public void about()
 	{
 		super.about();
-		penWidth(1);
+		handleCmd("load", allUserInput, "josh");
+		setStroke(1);
 	}
 }

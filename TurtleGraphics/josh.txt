@@ -1,0 +1,61 @@
+penup
+forward 100
+forward 50
+turnright 90
+forward 100
+forward 15
+pendown
+penwidth 10
+turnleft 270
+forward 60
+turnright 270
+forward 40
+turnleft 180
+forward 40
+turnleft 270
+forward 100
+turnleft 270
+forward 60
+turnleft 270
+forward 40
+turnright 180
+forward 40
+turnright 270
+forward 60
+penup
+forward 20
+pendown
+forward 60
+turnright 270
+forward 100
+turnright 270
+forward 60
+turnright 270
+forward 100
+turnright 270
+forward 60
+penup
+forward 20
+pendown
+forward 60
+turnright 270
+forward 50
+turnright 270
+forward 60
+turnleft 270
+forward 50
+turnleft 270
+forward 60
+penup
+forward 20
+pendown
+turnleft 270
+forward 100
+turnleft 180
+forward 50
+turnleft 270
+forward 60
+turnleft 270
+forward 50
+turnright 180
+forward 100
