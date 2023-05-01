@@ -43,9 +43,6 @@ public class GraphicsSystem extends LBUGraphics
 		MainFrame.pack();
 		MainFrame.setVisible(true);
 		MainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		super.about();
-		setStroke(1);
-		clear();
 		penDown();
 	}
 
@@ -110,15 +107,16 @@ public class GraphicsSystem extends LBUGraphics
 	
 	public void setMethodMap(ArrayList<String> allUserInput, Map<String, Consumer<String[]>> methodMap)
 	{	
-		methodMap.put("penup",   (sArray) -> penUp());
-		methodMap.put("pendown", (sArray) -> penDown());
-		methodMap.put("black",   (sArray) -> setPenColour(Color.black));
-		methodMap.put("green",   (sArray) -> setPenColour(Color.green));
-		methodMap.put("red",     (sArray) -> setPenColour(Color.red));
-		methodMap.put("white",   (sArray) -> setPenColour(Color.white));
-		methodMap.put("clear",   (sArray) -> clear());
-		methodMap.put("reset",   (sArray) -> reset());
-		methodMap.put("about",   (sArray) -> about());
+		methodMap.put("penup",       (sArray) -> penUp());
+		methodMap.put("pendown",     (sArray) -> penDown());
+		methodMap.put("black",       (sArray) -> setPenColour(Color.black));
+		methodMap.put("green",       (sArray) -> setPenColour(Color.green));
+		methodMap.put("red",         (sArray) -> setPenColour(Color.red));
+		methodMap.put("white",       (sArray) -> setPenColour(Color.white));
+		methodMap.put("clear",       (sArray) -> clear());
+		methodMap.put("reset",       (sArray) -> reset());
+		methodMap.put("super.about", (sArray) -> super.about());
+		methodMap.put("about",       (sArray) -> about());
 		
 		methodMap.put("saveimage",    (sArray) -> handleImg("save", getBufferedImage(), sArray[0]));
 		methodMap.put("loadimage",    (sArray) -> handleImg("load", getBufferedImage(), sArray[0]));
@@ -206,11 +204,11 @@ public class GraphicsSystem extends LBUGraphics
 				int num2 = Integer.parseInt(userInput[2]);
 				int num3 = Integer.parseInt(userInput[3]);
 				
-				if(0 >= numAmount || numAmount > 255 || 0 >= num2 || num2 > 255 || 0 >= num3 || num3 > 255)
+				if(0 > numAmount || numAmount > 255 || 0 > num2 || num2 > 255 || 0 > num3 || num3 > 255)
 				{
-					displayMessage("RGB values must be between 1 and 255");
+					displayMessage("RGB values must be between 0 and 255");
 					return false;
-				}
+				}else return true;
 			}else return true;
 		}
 		
@@ -227,7 +225,6 @@ public class GraphicsSystem extends LBUGraphics
 			return false;
 			}
 		}
-		return false;
 	}
 	
 	public void posCheck(int[] turtlePos)
@@ -258,13 +255,13 @@ public class GraphicsSystem extends LBUGraphics
 	{
 		try
 		{
-			if(operation.substring(0, 4).equals("save"))
+			if(operation.contains("save"))
 			{
 				store.saveImg(buffImg, FileName);
 				savedImg = true;
 			} 
 			
-			else if(operation.substring(0, 4).equals("load"))
+			else if(operation.contains("load"))
 			{
 				if(store.checkSave(2, savedImg))
 				{
@@ -289,10 +286,10 @@ public class GraphicsSystem extends LBUGraphics
 	{
 		try
 		{
-			allCmdArray.removeIf(cmd -> cmd.contains("save") || cmd.contains("load"));
-
-			if(operation.substring(0, 4).equals("save"))
+			if(operation.contains("save"))
 			{
+				allCmdArray.removeIf(cmd -> cmd.contains("save") || cmd.contains("load"));
+				
 				if (allCmdArray.size() != 0)
 				{
 					store.saveString(allCmdArray, FileName);
@@ -300,7 +297,7 @@ public class GraphicsSystem extends LBUGraphics
 				}else displayMessage("Nothing to save.");
 			} 
 			
-			else if(operation.substring(0, 4).equals("load"))
+			else if(operation.contains("load"))
 			{
 				if(store.checkSave(1, savedCmd))
 				{
@@ -312,6 +309,12 @@ public class GraphicsSystem extends LBUGraphics
 					savedCmd = true;
 				}
 			}
+			
+			else if(operation.contains("override"));
+			{
+				store.loadString(FileName);
+			}
+			
 		}
 
 		catch(IOException e)
@@ -390,8 +393,11 @@ public class GraphicsSystem extends LBUGraphics
 	@Override
 	public void about()
 	{
+		clear();
+		reset();
 		super.about();
-		handleCmd("load", allUserInput, "josh");
+		handleCmd("override", allUserInput, "josh");
 		setStroke(1);
+		reset();
 	}
 }
