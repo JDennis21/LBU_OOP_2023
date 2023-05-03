@@ -26,11 +26,6 @@ public class GraphicsSystem extends LBUGraphics
 	Map<String, Consumer<String[]>> methodMap = new HashMap<>();
 	
 	boolean savedCmd = true, savedImg = true;
-	
-	public static void main(String[] args)
-	{
-		new GraphicsSystem();
-	}
 
 	public GraphicsSystem()
 	{
@@ -64,7 +59,6 @@ public class GraphicsSystem extends LBUGraphics
 					posCheck(turtlePos);
 			}else allUserInput.remove(userInput[0]);
 		} 
-		
 		else
 		{
 			displayMessage("Command is not recongnised.");
@@ -85,7 +79,6 @@ public class GraphicsSystem extends LBUGraphics
 				triangle(Integer.parseInt(parameters[0]), Integer.parseInt(parameters[1]), Integer.parseInt(parameters[2]));
 			}else triangle(Integer.parseInt(parameters[0]));
 		}
-		
 		else
 		{
 			displayMessage("LBUGraphics V4.4");
@@ -97,7 +90,6 @@ public class GraphicsSystem extends LBUGraphics
 			savedCmd = true;
 			savedImg = true;
 		} 
-		
 		else if(!cmd.contains("image") && !cmd.contains("command"))
 		{
 			savedCmd = false;
@@ -146,12 +138,10 @@ public class GraphicsSystem extends LBUGraphics
 		{
 			return true;
 		} 
-		
 		else if(Arrays.asList(oneParam).contains(cmd) && userInput.length == 2) 
 		{
 			return boundsCheck(cmd, userInput);
 		} 
-		 
 		else if(Arrays.asList(threeParam).contains(cmd) && userInput.length == 4) 
 		{
 			return boundsCheck(cmd, userInput);
@@ -161,19 +151,16 @@ public class GraphicsSystem extends LBUGraphics
 			displayMessage("Triangle requires one or three parametes.");
 			return false;
 		}
-		
 		else if(Arrays.asList(oneParam).contains(cmd) && userInput.length != 2) 
 		{
 			displayMessage("Command requires a parameter");
 			return false;
 		} 
-		
 		else if(Arrays.asList(threeParam).contains(cmd) && userInput.length != 4) 
 		{
 			displayMessage("Command requires three parameters");
 			return false;
 		}	
-		
 		else if(userInput.length != 1) 
 		{
 			displayMessage("Command requires no parameters.");
@@ -192,13 +179,11 @@ public class GraphicsSystem extends LBUGraphics
 				displayMessage("Parameter must be an Integer between 1 and 100");
 				return false;
 			}
-			
 			else if((cmd.equals("turnright") || cmd.equals("turnleft")) && (0 >= numAmount || numAmount > 360))
 			{
 				displayMessage("Parameter must be an Integer between 1 and 360");
 				return false;
 			}
-			
 			else if(cmd.equals("pencolour"))
 			{
 				int num2 = Integer.parseInt(userInput[2]);
@@ -218,7 +203,6 @@ public class GraphicsSystem extends LBUGraphics
 			{
 				return true;
 			}
-			
 			else
 			{
 			displayMessage("Command requires Integer.");
@@ -233,6 +217,9 @@ public class GraphicsSystem extends LBUGraphics
 		{
 			displayMessage("Turtle out of bounds.");
 			
+			setxPos(turtlePos[0]);
+			setyPos(turtlePos[1]);
+			
 			if(savedImg == true)
 			{
 				handleImg("load", getBufferedImage(), "revertpanel");
@@ -244,9 +231,6 @@ public class GraphicsSystem extends LBUGraphics
 			savedImg = false;
 			}
 			
-			setxPos(turtlePos[0]);
-			setyPos(turtlePos[1]);
-			
 			allUserInput.remove(allUserInput.size() - 1);
 		}
 	}
@@ -255,27 +239,26 @@ public class GraphicsSystem extends LBUGraphics
 	{
 		try
 		{
-			if(operation.contains("save"))
+			if(operation.equals("save"))
 			{
 				store.saveImg(buffImg, FileName);
 				savedImg = true;
+				return;
 			} 
-			
-			else if(operation.contains("load"))
+			else if(operation.equals("load"))
 			{
 				if(store.checkSave(2, savedImg))
 				{
 					setBufferedImage(store.loadImg(FileName));
 					savedImg = true;
+					return;
 				}
 			}
-			
-			else if(operation.contains("panel"));
+			else if(operation.equals("panel"));
 			{
 				store.saveImg(buffImg, FileName);
 			}
 		}
-
 		catch(Exception e)
 		{
 			displayMessage("File not found.");
@@ -286,7 +269,7 @@ public class GraphicsSystem extends LBUGraphics
 	{
 		try
 		{
-			if(operation.contains("save"))
+			if(operation.equals("save"))
 			{
 				allCmdArray.removeIf(cmd -> cmd.contains("save") || cmd.contains("load"));
 				
@@ -294,10 +277,10 @@ public class GraphicsSystem extends LBUGraphics
 				{
 					store.saveString(allCmdArray, FileName);
 					savedCmd = true;
+					return;
 				}else displayMessage("Nothing to save.");
 			} 
-			
-			else if(operation.contains("load"))
+			else if(operation.equals("load"))
 			{
 				if(store.checkSave(1, savedCmd))
 				{
@@ -307,16 +290,17 @@ public class GraphicsSystem extends LBUGraphics
 						System.out.println(command);
 					}
 					savedCmd = true;
+					return;
 				}
 			}
-			
-			else if(operation.contains("override"));
+			else if(operation.equals("override"));
 			{
-				store.loadString(FileName);
+				for(String command : store.loadString(FileName))
+				{
+					processCommand(command);
+				}
 			}
-			
 		}
-
 		catch(IOException e)
 		{
 			displayMessage("File not found.");
@@ -373,7 +357,6 @@ public class GraphicsSystem extends LBUGraphics
 			forward(sides[2] / 2);
 			turnLeft(90);
 		}
-		
 		else 
 		{
 			displayMessage("Unable to create triangle with these sides.");

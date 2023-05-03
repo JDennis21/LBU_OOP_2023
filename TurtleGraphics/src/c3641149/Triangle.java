@@ -21,7 +21,7 @@ public class Triangle
 		
 		if(angleA + angleB + angleC != 180)
 		{
-			angleA = angleA + 1;
+			angleA += 1;
 		}
 		
 		int[] angles = new int[] {angleA, angleB, angleC};

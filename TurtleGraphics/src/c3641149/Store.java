@@ -18,20 +18,19 @@ public class Store
 	{
 		if(!saved && type == 1)
 		{
-			int yesNo = JOptionPane.showConfirmDialog(null,
+			int overwriteConfimation = JOptionPane.showConfirmDialog(null,
 					"Current commandlist is not saved. Would you like to overwrite?", "Warning",
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-			if(yesNo == JOptionPane.YES_OPTION)
+			if(overwriteConfimation == JOptionPane.YES_OPTION)
 			{
 				return true;
 			}else return false;
 		} 
-		
 		else if(!saved && type == 2)
 		{
-			int yesNo = JOptionPane.showConfirmDialog(null, "Current image is not saved. Would you like to overwrite?",
+			int overwriteComfimation = JOptionPane.showConfirmDialog(null, "Current image is not saved. Would you like to overwrite?",
 					"Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-			if(yesNo == JOptionPane.YES_OPTION)
+			if(overwriteComfimation == JOptionPane.YES_OPTION)
 			{
 				return true;
 			}else return false;
