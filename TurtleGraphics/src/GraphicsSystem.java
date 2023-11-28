@@ -254,7 +254,7 @@ public class GraphicsSystem extends LBUGraphics
 					return;
 				}
 			}
-			else if(operation.equals("panel"));
+			else if(operation.equals("panel"))
 			{
 				store.saveImg(buffImg, FileName);
 			}
@@ -290,8 +290,7 @@ public class GraphicsSystem extends LBUGraphics
 						System.out.println(command);
 					}
 					savedCmd = true;
-					return;
-				}
+				}else return;
 			}
 			else if(operation.equals("override"));
 			{
